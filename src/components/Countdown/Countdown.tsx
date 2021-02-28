@@ -6,6 +6,7 @@ let countdownTimeout: NodeJS.Timeout;
 export function Countdown() {
   const [time, setTime] = useState(0.1 * 60);
   const [isActive, setiSActive] = useState(false);
+  const [hasFinished, setHasFinished] = useState(false);
 
   const minutes = Math.floor(time / 60);
   const seconds = time % 60;
@@ -21,7 +22,6 @@ export function Countdown() {
     clearTimeout(countdownTimeout);
     setiSActive(false);
     setTime(0.1 * 60);
-
   };
 
   useEffect(() => {
@@ -29,6 +29,9 @@ export function Countdown() {
       countdownTimeout = setTimeout(() => {
         setTime(time - 1);
       }, 1000);
+    } else if (isActive && time === 0) {
+      setHasFinished(true);
+      setiSActive(false);
     }
   }, [isActive, time]);
   return (
@@ -44,22 +47,30 @@ export function Countdown() {
           <span>{secondRight}</span>
         </div>
       </div>
-      {isActive ? (
-        <button
-          type="button"
-          className={`${styles.countdownButton} ${styles.countdownButtonActive}`}
-          onClick={resetCountdown}
-        >
-          Abandonar ciclo
+      {hasFinished ? (
+        <button disabled={true} type="button" className={styles.countdownButton}>
+          Ciclo encerrado
         </button>
       ) : (
-        <button
-          type="button"
-          className={styles.countdownButton}
-          onClick={startCountdown}
-        >
-          Iniciar um Ciclo
-        </button>
+        <>
+          {isActive ? (
+            <button
+              type="button"
+              className={`${styles.countdownButton} ${styles.countdownButtonActive}`}
+              onClick={resetCountdown}
+            >
+              Abandonar ciclo
+            </button>
+          ) : (
+            <button
+              type="button"
+              className={styles.countdownButton}
+              onClick={startCountdown}
+            >
+              Iniciar um Ciclo
+            </button>
+          )}
+        </>
       )}
     </div>
   );
